@@ -1,0 +1,18 @@
+#+TITLE: Exposé
+#+DATE: 29 Jun 2019
+#+AUTHOR: Richard Stewing
+#+OPTIONS: toc:nil
+#+LATEX_HEADER: \usepackage{tikz}
+#+LATEX_HEADER: \usetikzlibrary{arrows.meta}
+#+LATEX_HEADER: \usepackage[a4paper,
+#+LATEX_HEADER:            left=3.5cm,
+#+LATEX_HEADER:            right=2.5cm,
+#+LATEX_HEADER:            bottom=3.5cm,
+#+LATEX_HEADER:            top=3cm]{geometry}
+#+LATEX_HEADER: \usepackage[margin=0pt,font=small,labelfont=bf]{caption}
+#+LATEX_HEADER: \usepackage{pifont}
+#+LATEX_HEADER: \newcommand{\xmark}{\ding{55}}
+#+LATEX_HEADER: \newcommand{\cmark}{\ding{52}}
+#+OPTIONS: toc:nil
+#+LANGUAGE: en
+

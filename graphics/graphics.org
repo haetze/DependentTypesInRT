@@ -1,0 +1,5 @@
+#+TITLE: Graphics
+#+DATE: 29 Jun 2019
+#+AUTHOR: Richard Stewing
+#+OPTIONS: title:nil toc:nil
+
