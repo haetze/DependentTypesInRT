@@ -2,7 +2,9 @@
 #+DATE: 29 Jun 2019
 #+AUTHOR: Richard Stewing
 #+EMAIL: richard.stewing@udo.edu
-#+OPTIONS: toc:nil
+#+OPTIONS: toc:nil email:t
+#+LATEX_HEADER: \usepackage[nolist]{acronym}
+#+LATEX_HEADER: \usepackage{amsthm}
 #+LATEX_HEADER: \usepackage{tikz}
 #+LATEX_HEADER: \usetikzlibrary{arrows.meta}
 #+LATEX_HEADER: \usepackage[a4paper,
@@ -14,8 +16,101 @@
 #+LATEX_HEADER: \usepackage{pifont}
 #+LATEX_HEADER: \newcommand{\xmark}{\ding{55}}
 #+LATEX_HEADER: \newcommand{\cmark}{\ding{52}}
-#+OPTIONS: toc:nil
 #+LANGUAGE: en
 
-* Introduction 
+#+begin_acronym
+  \acrodef{WCET}{Worst Case Execution Time}
+#+end_acronym
+[fn:idris] https://www.idris-lang.org/
+[fn:prf_left_out] The proof term p is omitted for brevity.
 
+* Introduction 
+  The main concern in the area of Real Time Systems is to decide whether or not
+  a given System is scheduable. 
+  In order to decide this problem, it is necessary to know the \ac{WCET} of each
+  job in the system. 
+  The computation of the \ac{WCET} in general is undecidable, as it is not even 
+  possible to decide termination of a given problem. 
+  This is famously known as the Halting Problem. 
+  Since the computation of the \ac{WCET} is a requirement to decide 
+  schedulability, many techniques have been employed. 
+  This includes Program Path Analysis and Static Analysis such as 
+  Cache or Value Analysis.
+  Most of these approaches lack in precision and therefore overestimate the 
+  \ac{WCET}. 
+  Examples of such an overestimation is the Cache Analysis which lead to the 
+  Industry-best-practice to deactivate the cache in order to have a higher 
+  degree of predictability. 
+  Another industry best practice is to simply test the program and a buffer 
+  to the measurement in order to have a safe upper bound for the \ac{WCET}. 
+  The insufficiency for critical systems of this approach is apparent to any 
+  conscious person. 
+  
+  We want to propose an additional approach, building on the large amount of 
+  work on dependent types. 
+  The conceptional approach is to tie an abstract execution time to each value
+  in the computation.
+  An important distinction to make at this point is that the whole power 
+  of dependent types are not used. 
+  We are only going to consider execution time and size descriptions for data
+  as natural numbers.
+  The goal is to practically evaluate this approach as the means to probably 
+  approximate the \ac{WCET} and further describe possibilities to use the 
+  information encoded as types in the program at run-time to further improve 
+  scheduability. 
+
+* An Introductory Example
+  For better understanding, we are now gonna present a first simplistic approach
+  for describing the \ac{WCET} in the types of values. 
+  As described above, the basic idea is to attach a simple value to the types 
+  value. 
+  Consider this example in the Idris Programming Language [fn:idris]:
+  #+begin_src idris
+  data In : (a : Type) -> (t : Nat) -> Type where
+    InC : (x : a) -> In a t
+  #+end_src
+  For anyone not familiar with Generic Algebraic Data Types, the here declared 
+  type constructor $\mathit{In}$ maps each type $a$ and execution time $t$ to a
+  new type. 
+  A value of this type is constructed using the value constructor 
+  $\mathit{InC}$. 
+  
+  This new data type can be used to create value that have there execution time 
+  directly attached to them in the type. 
+  #+begin_src idris
+  zero : In Nat 0
+  zero = InC 0
+  #+end_src
+  It should be noted that this is equally correct as 
+  #+begin_src idris
+  zero : In Nat 10
+  zero = InC 0
+  #+end_src
+  This shows that the correctness of the execution time of such base values can
+  not be verified with this approach. 
+  A couple of simplistic functions could look like this: 
+  #+begin_src idris
+  add : In Nat t -> In Nat t' -> In Nat (t+t'+1)
+  add (InC x) (InC y) = InC (x+y) 
+
+  mult : In Nat t -> In Nat t' -> In Nat (t+t'+1)
+  mult (InC x) (InC y) = InC (x*y) 
+  #+end_src
+  As a first take this might look fine, assuming the correctness 
+  of the given execution time. 
+  This can even be used to calculate the execution time of 
+  a combined function. [fn:prf_left_out]
+  #+begin_src idris
+  multAndAdd : In Nat t -> In Nat t' -> In Nat t'' -> In Nat (t+t'+t''+2)
+  multAndAdd {t} {t'} {t''} x y z = rewrite p t t' t'' in add (mult x y) z
+  #+end_src
+  The proof only considers the execution time and the two calculated 
+  execution times, one from the call $\mathit{add}(\mathit{mult}(x)(y))$ and the
+  one expected by the type of $\mathit{multAndAdd}$, are indeed the same. 
+  
+  This small example shows that it is indeed possible two tie an execution time
+  to a value. 
+  The correctness and feasibility of this approach still needs to be evaluated.
+  
+  
+  
